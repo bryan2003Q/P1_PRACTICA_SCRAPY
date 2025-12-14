@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
+import datetime
 
 # 🔹 1. URL (AQUÍ PEGAS EL LINK QUE TE DÉ EL PROFESOR)
 URL = "https://en.wikipedia.org/wiki/List_of_countries_by_population"
@@ -33,11 +34,22 @@ for index, table in enumerate(tables):
 
     # Convertir a DataFrame
     df = pd.DataFrame(data)
+    
+    
+     # --- LIMPIEZA ---
+    df = df.applymap(lambda x: x.replace('\n', ' ') if isinstance(x, str) else x)
+    df.columns = df.iloc[0]  # primera fila como encabezado
+    df = df[1:].reset_index(drop=True)
+    
+    
+    #Imprimir y guardar
+    
     print(f"\n📊 Tabla {index + 1}")
     print(df.to_string())
     
     #Guardar la tabla en csv
-    df.to_csv(f"datos/tabla_{index+1}.csv", index=False)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    df.to_csv(f"datos/tabla_{index+1}_{timestamp}.csv", index=False)
 
 # 🔹 5. Cerrar navegador
 driver.quit()
