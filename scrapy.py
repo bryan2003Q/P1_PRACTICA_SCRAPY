@@ -35,6 +35,9 @@ for index, table in enumerate(tables):
     df = pd.DataFrame(data)
     print(f"\n📊 Tabla {index + 1}")
     print(df.to_string())
+    
+    #Guardar la tabla en csv
+    df.to_csv(f"datos/tabla_{index+1}.csv", index=False)
 
 # 🔹 5. Cerrar navegador
 driver.quit()
