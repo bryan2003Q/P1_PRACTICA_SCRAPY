@@ -99,3 +99,9 @@ print("\nINGLÉS:\n")
 for palabra in top_palabras_english:
     traduccion = GoogleTranslator(source='en', target='es').translate(palabra)
     print(f"La palabra '{palabra}' significa '{traduccion}' en español.")
+
+
+
+
+
+
