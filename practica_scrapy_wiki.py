@@ -7,6 +7,7 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 import spacy
 import stanza
+from io import StringIO
 from collections import Counter
 from deep_translator import GoogleTranslator
 
@@ -28,7 +29,7 @@ tables = soup.find_all("table", class_="wikitable")
 print(f"Número de tablas encontradas: {len(tables)}")
 
 # Guardar los DataFrames de cada tabla
-dfs = [pd.read_html(str(table))[0] for table in tables]
+dfs = [pd.read_html(StringIO(str(table)))[0] for table in tables]
 
 # Unir todos los DataFrames en uno solo
 tabla_unificada = pd.concat(dfs, ignore_index=True)
@@ -37,6 +38,7 @@ tabla_unificada.head()
 # =========================
 # 2. GUARDAR EN UN ARCHIVO XLSX
 # =========================
+
 
 archivo_salida = "latin_phrases_wikipedia.xlsx"
 tabla_unificada.to_excel(archivo_salida, index=False)
@@ -48,7 +50,7 @@ archivo_salida
 
 # NLP inglés y latín
 nlp_en = spacy.load("en_core_web_sm")
-stanza.download("la")          # Solo la primera vez
+stanza.download("la")  # Solo la primera vez
 nlp_lat = stanza.Pipeline("la")
 
 # Preparar textos
@@ -62,11 +64,21 @@ doc_english = nlp_en(texto_english)
 # PALABRAS Y VERBOS EN LATÍN
 # =========================
 
-palabras_latin = [word.text.lower() for sent in doc_latin.sentences for word in sent.words if word.text.isalpha() and word.upos in {"NOUN", "ADJ"}]
+palabras_latin = [
+    word.text.lower()
+    for sent in doc_latin.sentences
+    for word in sent.words
+    if word.text.isalpha() and word.upos in {"NOUN", "ADJ"}
+]
 frecuencia_palabras_latin = Counter(palabras_latin)
 frecuencia_palabras_latin.most_common(10)
 
-verbos_latin = [word.lemma.lower() for sent in doc_latin.sentences for word in sent.words if word.upos == "VERB"]
+verbos_latin = [
+    word.lemma.lower()
+    for sent in doc_latin.sentences
+    for word in sent.words
+    if word.upos == "VERB"
+]
 frecuencia_verbos_latin = Counter(verbos_latin)
 frecuencia_verbos_latin.most_common(10)
 
@@ -74,7 +86,9 @@ frecuencia_verbos_latin.most_common(10)
 # PALABRAS Y VERBOS EN INGLÉS
 # =========================
 
-palabras_english = [token.text.lower() for token in doc_english if token.is_alpha and not token.is_stop]
+palabras_english = [
+    token.text.lower() for token in doc_english if token.is_alpha and not token.is_stop
+]
 frecuencia_palabras_english = Counter(palabras_english)
 frecuencia_palabras_english.most_common(10)
 
@@ -86,22 +100,20 @@ frecuencia_verbos_english.most_common(10)
 # 4. GENERAR FRASES EN ESPAÑOL
 # =========================
 
-top_palabras_latin = [palabra for palabra, _ in frecuencia_palabras_latin.most_common(5)]
-top_palabras_english = [palabra for palabra, _ in frecuencia_palabras_english.most_common(5)]
+top_palabras_latin = [
+    palabra for palabra, _ in frecuencia_palabras_latin.most_common(5)
+]
+top_palabras_english = [
+    palabra for palabra, _ in frecuencia_palabras_english.most_common(5)
+]
 
 # Traducción de palabras
 print("LATÍN:\n")
 for palabra in top_palabras_latin:
-    traduccion = GoogleTranslator(source='latin', target='es').translate(palabra)
+    traduccion = GoogleTranslator(source="latin", target="es").translate(palabra)
     print(f"La palabra '{palabra}' significa '{traduccion}' en español.")
 
 print("\nINGLÉS:\n")
 for palabra in top_palabras_english:
-    traduccion = GoogleTranslator(source='en', target='es').translate(palabra)
+    traduccion = GoogleTranslator(source="en", target="es").translate(palabra)
     print(f"La palabra '{palabra}' significa '{traduccion}' en español.")
-
-
-
-
-
-
