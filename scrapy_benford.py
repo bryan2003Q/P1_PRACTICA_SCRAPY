@@ -26,7 +26,7 @@ print("Archivo paises ley benford generado correctamente ")
 #limpia de datos numericos
 columna_poblacion = tablas_unidas.columns[1]
 
-numeros = (
+tablas_unidas['Poblacion_Limpia'] = (
     tablas_unidas[columna_poblacion]
     .astype(str)
     .str.replace(",", "", regex=False)
@@ -34,8 +34,15 @@ numeros = (
 )
 
 
-primeros_digitos=[str(n)[0] for n in numeros if n>0]
+# Extraer el primer dígito
+tablas_unidas['Primer_Digito'] = tablas_unidas['Poblacion_Limpia'].astype(str).str[0]
+tablas_unidas[['Country or territory', 'Poblacion_Limpia', 'Primer_Digito']].to_excel(
+    "paises_primer_digito.xlsx", index=False
+)
 
+
+numeros = tablas_unidas['Poblacion_Limpia']
+primeros_digitos = tablas_unidas['Primer_Digito']
 
 conteo=Counter(primeros_digitos)
 total=sum(conteo.values())
