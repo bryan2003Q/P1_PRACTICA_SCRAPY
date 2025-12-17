@@ -21,4 +21,3 @@ tablas_unidas.to_excel("frases_latin.xlsx", index=False)
 print("Archivo paises generado correctamente ")
 
 
-
