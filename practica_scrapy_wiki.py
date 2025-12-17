@@ -9,8 +9,10 @@ import spacy
 import stanza
 from io import StringIO
 from collections import Counter
+import logging
 from deep_translator import GoogleTranslator
 
+#logging.getLogger("stanza").setLevel(logging.ERROR)
 # URL de la página de Wikipedia
 url = "https://en.wikipedia.org/wiki/List_of_Latin_phrases_(full)"
 
@@ -51,7 +53,7 @@ archivo_salida
 # NLP inglés y latín
 nlp_en = spacy.load("en_core_web_sm")
 stanza.download("la")  # Solo la primera vez
-nlp_lat = stanza.Pipeline("la")
+nlp_lat = stanza.Pipeline("la",verbose=False)
 
 # Preparar textos
 texto_latin = " ".join(tabla_unificada["Latin"].dropna().astype(str))
@@ -73,6 +75,12 @@ palabras_latin = [
 frecuencia_palabras_latin = Counter(palabras_latin)
 frecuencia_palabras_latin.most_common(10)
 
+
+print("\n palabras mas frecuentes en Latin")
+for palabra, freq in frecuencia_palabras_latin.most_common(10):
+    print(f"{palabra}: {freq} veces ")
+
+
 verbos_latin = [
     word.lemma.lower()
     for sent in doc_latin.sentences
@@ -82,19 +90,42 @@ verbos_latin = [
 frecuencia_verbos_latin = Counter(verbos_latin)
 frecuencia_verbos_latin.most_common(10)
 
+
+print("\n verbos mas frecuentes en Latin")
+for verbo, freq in frecuencia_verbos_latin.most_common(10):
+    print(f"{verbo}: {freq} veces ")
+
+
 # =========================
 # PALABRAS Y VERBOS EN INGLÉS
 # =========================
 
 palabras_english = [
-    token.text.lower() for token in doc_english if token.is_alpha and not token.is_stop
+    token.text.lower() 
+    for token in doc_english 
+    if token.is_alpha and not token.is_stop
 ]
 frecuencia_palabras_english = Counter(palabras_english)
 frecuencia_palabras_english.most_common(10)
 
-verbos_english = [token.lemma_.lower() for token in doc_english if token.pos_ == "VERB"]
+
+print("\n palabras mas frecuentes en ingles")
+for palabra, freq in frecuencia_palabras_english.most_common(10):
+    print(f"{palabra}: {freq} veces ")
+
+
+verbos_english = [
+    token.lemma_.lower() 
+    for token in doc_english 
+    if token.pos_ == "VERB"
+    ]
 frecuencia_verbos_english = Counter(verbos_english)
 frecuencia_verbos_english.most_common(10)
+
+
+print("\n verbos mas frecuentes en ingles")
+for verbo, freq in frecuencia_verbos_english.most_common(10):
+    print(f"{verbo}: {freq} veces ")
 
 # =========================
 # 4. GENERAR FRASES EN ESPAÑOL
